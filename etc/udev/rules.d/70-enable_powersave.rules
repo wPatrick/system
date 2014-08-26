@@ -1,0 +1,10 @@
+SUBSYSTEM!="usb", GOTO="power_usb_rules_end"
+ACTION!="add", GOTO="power_usb_rules_end"
+TEST!="power/control", GOTO="power_usb_rules_end"
+
+## Blacklist. Duplicate the following line with varying usbids
+ATTR{idVendor}=="1af3", ATTR{idProduct}=="0001", GOTO="power_usb_rules_end"    # Zowie Gaming Mouse
+
+ATTR{power/control}="auto"
+
+LABEL="power_usb_rules_end"

@@ -1,0 +1,35 @@
+# 
+# /etc/fstab: static file system information
+#
+# <file system> <dir>   <type>  <options>   <dump>  <pass>
+# /dev/sda2 UUID=fae075d6-6e29-4a61-ad5e-4271b8a6ad3e
+LABEL=arch_root         /           btrfs       rw,noatime,compress=lzo,discard,ssd,space_cache,subvol=__active/rootvol 0 0
+
+# /dev/sdb1 UUID=7fd8c1ae-3cf4-48f8-b29c-b6cf0f231976
+LABEL=arch_var          /var        btrfs       rw,noatime,compress=lzo,discard,ssd,space_cache,subvol=__active/var 0 0
+
+# /dev/sdc1 UUID=557344b6-6503-4c99-b971-fd9760296cb2
+LABEL=arch_home         /home       btrfs       rw,noatime,compress=lzo,space_cache,subvol=__active/home    0 0
+
+# /dev/sdc1 UUID=557344b6-6503-4c99-b971-fd9760296cb2
+LABEL=arch_home         /opt        btrfs       rw,noatime,compress=lzo,space_cache,subvol=__active/opt 0 0
+
+# /dev/sdd  UUID=8b535f38-526d-4b79-8c20-7a5a331fcfd4
+LABEL=storage       /var/lib/docker         btrfs       rw,noatime,compress=lzo,space_cache,subvol=__active/docker  0 0
+LABEL=storage       /var/lib/container      btrfs       rw,noatime,compress=lzo,space_cache,subvol=__active/container   0 0
+LABEL=storage       /home/zeno/dl	    btrfs       rw,noatime,compress=lzo,space_cache,subvol=__active/data/zeno/dl   0 0
+
+# /dev/sda1 UUID=8617-24C9
+UUID=8617-24C9          /boot/efi   vfat        rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro    0 2
+
+# /dev/sdc2 UUID=2da3ac56-6b50-4532-91a4-368f286bb2e1
+UUID=2da3ac56-6b50-4532-91a4-368f286bb2e1       none        swap        defaults    0 0
+
+# user specific mounts (tmpfs)
+tmpfs                   /home/zeno/tmp          tmpfs       rw,nosuid,nodev,relatime,size=1640492k,mode=700,uid=1000,gid=1000   0 0
+
+# btrfs snapshot mounts
+LABEL=arch_root		/run/btrfs/arch_root	btrfs	rw,noatime,compress=lzo,discard,ssd,space_cache,subvol=__snapshots 0 0
+LABEL=arch_var		/run/btrfs/arch_var	btrfs	rw,noatime,compress=lzo,discard,ssd,space_cache,subvol=__snapshots 0 0
+LABEL=arch_home		/run/btrfs/arch_home	btrfs	rw,noatime,compress=lzo,space_cache,subvol=__snapshots 0 0
+LABEL=storage		/run/btrfs/storage	btrfs	rw,noatime,compress=lzo,space_cache,subvol=__snapshots 0 0

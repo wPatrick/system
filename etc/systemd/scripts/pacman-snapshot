@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DATE=$(date +%s)
+UUID=$(uuidgen)
+
+/usr/bin/btrfs subvolume snapshot -r /var/lib/pacman/local /run/btrfs/arch_var/var/lib/pacman/local/pacman_$DATE_$UUID
+
+# vim: ft=sh
+# EOF

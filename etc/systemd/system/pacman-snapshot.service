@@ -1,0 +1,7 @@
+[Unit]
+Description=Snapshot pacman database
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /etc/systemd/scripts/pacman-snapshot
+RemainAfterExit=no
