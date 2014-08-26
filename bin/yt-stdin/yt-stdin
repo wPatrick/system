@@ -1,0 +1,5 @@
+#!/bin/bash
+youtube-dl "$1" -q -o - | mpv --no-terminal --profile=live -
+
+# EOF
+# vim :set ts=4 sw=4 sts=4 et :

@@ -1,0 +1,73 @@
+#!/bin/bash
+# kept lean and mean
+
+declare -i VOL_STEPS=5
+
+vol() {
+    ponymix get-volume
+}
+
+inc() {
+    [[ -n $1 ]] && VOL_STEPS=$1
+    unmute
+    local -i vol=$(ponymix increase $VOL_STEPS)
+    [[ -z $2 ]] && notify_passive $vol
+}
+
+dec() {
+    [[ -n $1 ]] && VOL_STEPS=$1
+    unmute
+    local -i vol=$(ponymix decrease $VOL_STEPS)
+    (( $vol == 0 )) && mute
+    [[ -z $2 ]] && notify_passive $vol
+}
+
+toggle_mute() {
+    ponymix toggle &>/dev/null
+    [[ -z $1 ]] && notify_active
+}
+
+mute() {
+    ponymix mute &>/dev/null
+}
+
+unmute() {
+    ponymix unmute &>/dev/null
+}
+
+notify_active() {
+    ponymix is-muted && { volnoti-show -m; return; }
+    local -i v=$(ponymix get-volume)
+    (( $v > 100 )) && v=100 # max value
+    (( $v == 0 )) && volnoti-show -m || volnoti-show $v
+}
+
+notify_passive() {
+    local -i v=$1
+    local -i m=$1
+    (( $v > 100 )) && v=100 # max value
+    (( $v == 0 )) && mute && volnoti-show -m || volnoti-show $v
+}
+
+case "$1" in
+    i|inc|increase)
+        inc "$2" "$3"
+        ;;
+    d|dec|decrease)
+        dec "$2" "$3"
+        ;;
+    m|mute)
+        toggle_mute "$2"
+        ;;
+    n|noti|notify)
+        notify_active
+        ;;
+    *)
+        vol
+        ;;
+esac
+
+unset VOL_STEPS
+
+# EOF
+# vim :set ft=sh ts=4 sw=4 sts=4 et :

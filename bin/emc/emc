@@ -1,0 +1,63 @@
+#!/bin/zsh
+
+#[[ ${#} -lt 1 ]] && exit 1
+
+#POSIX var
+OPTIND=1
+
+#out own
+auto=true
+terminal=false
+gui=false
+
+function show_help() {
+    echo "-a for auto discover, -g for GUI, -t for terminal"
+}
+
+while getopts ":h?atg" opt; do
+    case "$opt" in
+        h|\?)
+            show_help
+            exit 0
+            ;;
+        a)
+            auto=true
+            ;;
+        t)
+            terminal=true
+            auto=false
+            ;;
+        g)
+            auto=false
+            gui=true
+            ;;
+        esac
+done
+shift $((OPTIND-1))
+[ "$1" = "--" ] && shift
+
+function exec_editor() {
+    AEDIT=${ALTERNATE_EDITOR:-emacs}
+    SOCKET=""
+    if [[ -n $XDG_RUNTIME_DIR && -S $XDG_RUNTIME_DIR/emacs/server ]]; then
+        SOCKET="--socket-name=$XDG_RUNTIME_DIR/emacs/server"
+    fi
+    systemctl --user -q is-active emacs.service
+    if (($auto) && [[ $? -eq 0 ]]); then
+        if [[ -n "$DISPLAY" ]]; then
+            emacsclient --create-frame --alternate-editor="$AEDIT" "$SOCKET" "$@"
+        else
+            emacsclient --tty --alternate-editor="$AEDIT" "$SOCKET" "$@"
+        fi
+    elif ($gui); then
+        emacsclient --create-frame --alternate-editor="$AEDIT" "$SOCKET" "$@"
+    elif ($terminal); then
+        emacsclient --tty --alternate-editor="$AEDIT" "$SOCKET" "$@"
+    else
+        exec "$AEDIT" "$@"
+    fi
+    unset AEDIT SOCKET
+}
+
+exec_editor "$@"
+unset auto terminal gui

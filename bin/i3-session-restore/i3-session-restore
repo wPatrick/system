@@ -1,0 +1,52 @@
+#!/bin/zsh
+#
+I3PATH="${XDG_CONFIG_HOME:-~/.config}/i3"
+[[ -d $I3PATH ]] || exit 1
+
+function exec_times() {
+    param="${@[@]:2:(( $# - 3 ))}"
+    declare -i count="$@[(( $# - 1))]"
+    declare -i delay="$@[$#]"
+    ((($count == 0)) || (($count > 5)) || [[ -z "$1" ]]) && return
+    for i in {1..$count}; do
+        exec $1 $param &>/dev/null &
+        (($delay == 0)) || sleep $delay
+    done
+    unset i count delay param
+}
+
+function restore_layout() {
+    for file ($I3PATH/ws.d/ws_*); do
+        if [[ -e $file ]]; then
+            split=("${(s/_/)${${file%\.*}##*\/}}")
+            i3-msg "workspace $split[2]; append_layout $file"
+        fi
+    done
+    unset file split
+}
+
+function start_program() {
+    for file ($I3PATH/cmd.d/*); do
+        if [[ -e $file ]]; then
+            meta=("${(s/_/)${file##*\/}}")
+            read line < $file
+            (( ${+line} )) &&
+            {
+                cmdargs=(${=line})
+                ((( ${+cmdargs[2]} )) &&
+                        exec_times "${cmdargs[1]}" "${cmdargs[@]:1}" $meta[2] $meta[3]
+                ) ||
+                    {
+                        exec_times "${cmdargs[1]}" $meta[2] $meta[3]
+                    }
+            }
+        fi
+    done
+    unset file split meta cmdargs
+}
+
+restore_layout
+start_program
+
+# EOF
+# vim :set ts=4 sw=4 sts=4 et :
